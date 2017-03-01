@@ -62,6 +62,16 @@
             return $books;
         }
 
+        static function find($id)
+        {
+            $query = $GLOBALS['DB']->query("SELECT * FROM author WHERE id = {$id};");
+            $returned_author = $query->fetch(PDO::FETCH_ASSOC);
+            $name = $returned_author['name'];
+            $id = $returned_author['id'];
+            $author = new Author($name, $id);
+            return $author;
+
+        }
         static function getAll()
         {
             $returned_authors = $GLOBALS['DB']->query("SELECT * FROM author;");
@@ -75,16 +85,6 @@
             return $authors;
         }
 
-        static function find($id)
-        {
-            $query = $GLOBALS['DB']->query("SELECT * FROM author WHERE id = {$id};");
-            $returned_author = $query->fetch(PDO::FETCH_ASSOC);
-            $name = $returned_author['name'];
-            $id = $returned_author['id'];
-            $author = new Author($name, $id);
-            return $author;
-
-        }
         static function deleteAll()
         {
             $GLOBALS['DB']->exec("DELETE FROM author;");

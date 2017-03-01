@@ -25,10 +25,14 @@
           return $this->id;
       }
 
-      function save()
+      function save($number_of_books = null)
       {
+          //Books Table
           $GLOBALS['DB']->exec("INSERT INTO books (title) VALUES ('{$this->getTitle()}');");
           $this->id = $GLOBALS['DB']->lastInsertId();
+
+          //Copies Table
+          $GLOBALS['DB']->exec("INSERT INTO copies (book_id, number) VALUES ('{$this->getId()}', {$number_of_books});");
       }
 
       function update($new_title)
