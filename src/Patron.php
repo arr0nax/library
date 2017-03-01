@@ -55,9 +55,24 @@
             $this->id = $GLOBALS['DB']->lastInsertId();
         }
 
-        function checkout($book)
+        function checkout($checkout)
         {
-            
+            $GLOBALS['DB']->exec("INSERT INTO checkout (patron_id, copy_id, due_date, checkout_date, returned) VALUES ({$this->getId()}, {$checkout->getCopy_id()}, '{$checkout->getDueDate()}', '{$checkout->getCheckoutDate()}', {$checkout->getReturned()});");
+        }
+
+
+        static function find($search_id)
+        {
+            $query = $GLOBALS['DB']->query("SELECT * FROM patrons WHERE id = {$search_id};");
+
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+
+            $name = $result['name'];
+            $password = $result['password'];
+            $email = $result['email'];
+            $id = $result['id'];
+            $new_result = new Patron($name, $password, $email, $id);
+            return $new_result;
         }
 
         static function getAll()
