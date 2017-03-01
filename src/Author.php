@@ -39,7 +39,13 @@
 
         function addBook($book)
         {
-            $GLOBALS['DB']->exec("INSERT INTO books_authors (book_id, author_id) VALUES ({$book->getId()}, {$this->id});");
+            $query = $GLOBALS['DB']->query("SELECT * FROM books_authors WHERE book_id = {$book->getId()} AND author_id = {$this->getId()};");
+
+            $retrieved = $query->fetchAll(PDO::FETCH_ASSOC);
+
+            if(!$retrieved){
+                $GLOBALS['DB']->exec("INSERT INTO books_authors (book_id, author_id) VALUES ({$book->getId()}, {$this->id});");
+            }
         }
 
         function getBooks()

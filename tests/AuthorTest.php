@@ -138,6 +138,24 @@ class AuthorTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals([$test_book], $result);
     }
 
+    function test_addBook_duplicate()
+    {
+        $title = 'See Spot Run';
+        $test_book = new Book($title);
+        $test_book->save();
+
+        $name = 'John';
+        $test_author = new Author($name);
+        $test_author->save();
+
+        $test_author->addBook($test_book);
+        $test_author->addBook($test_book);
+
+        $result = $test_author->getBooks();
+
+        $this->assertEquals([$test_book], $result);
+    }
+
     function test_getBooks()
     {
         $title = 'See Spot Run';
