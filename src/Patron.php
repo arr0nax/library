@@ -60,10 +60,40 @@
             $GLOBALS['DB']->exec("INSERT INTO checkout (patron_id, copy_id, due_date, checkout_date, returned) VALUES ({$this->getId()}, {$checkout->getCopy_id()}, '{$checkout->getDueDate()}', '{$checkout->getCheckoutDate()}', {$checkout->getReturned()});");
         }
 
+        static function login($email, $password)
+        {
+            $query = $GLOBALS['DB']->query("SELECT * FROM patron WHERE email = '{$email}' AND password = '{$password}');");
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            if($result) {
+                $name = $result['name'];
+                $password = $result['password'];
+                $email = $result['email'];
+                $id = $result['id'];
+                $new_result = new Patron($name, $password, $email, $id);
+                return $new_result;
+            }
+            return false;
+
+        }
+
 
         static function find($search_id)
         {
             $query = $GLOBALS['DB']->query("SELECT * FROM patrons WHERE id = {$search_id};");
+
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+
+            $name = $result['name'];
+            $password = $result['password'];
+            $email = $result['email'];
+            $id = $result['id'];
+            $new_result = new Patron($name, $password, $email, $id);
+            return $new_result;
+        }
+
+        static function findByEmail($email)
+        {
+            $query = $GLOBALS['DB']->query("SELECT * FROM patrons WHERE email = '{$email}';");
 
             $result = $query->fetch(PDO::FETCH_ASSOC);
 
