@@ -79,6 +79,12 @@
         $this->id = $GLOBALS['DB']->lastInsertId();
     }
 
+    function getBook()
+    {
+        $query = $GLOBALS['DB']->query("SELECT * FROM copies WHERE id = {$search_id};");
+
+    }
+
     static function find($search_id)
     {
         $query = $GLOBALS['DB']->query("SELECT * FROM checkout WHERE id = {$search_id};");
@@ -93,6 +99,24 @@
         $id = $result['id'];
         $new_result = new Checkout($patron_id, $copy_id, $due_date, $checkout_date, $returned, $id);
         return $new_result;
+    }
+
+    static function getByPatron($patron_id)
+    {
+        $returned_checkouts = $GLOBALS['DB']->query("SELECT * FROM checkout WHERE patron_id = {$patron_id};");
+        $checkouts =[];
+        foreach($returned_checkouts as $checkout) {
+            $patron_id = $checkout['patron_id'];
+            $copy_id = $checkout['copy_id'];
+            $due_date = $checkout['due_date'];
+            $checkout_date = $checkout['checkout_date'];
+            $returned = $checkout['returned'];
+            $id = $checkout['id'];
+            $new_checkout = new Checkout($patron_id, $copy_id, $due_date, $checkout_date, $returned, $id);
+            array_push($checkouts, $new_checkout);
+
+        }
+        return $checkouts;
     }
 
     static function getAll()

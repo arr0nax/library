@@ -27,8 +27,14 @@
 
         function save()
         {
-            $GLOBALS['DB']->exec("INSERT INTO author (name) VALUES ('{$this->getName()}');");
-            $this->id = $GLOBALS['DB']->lastInsertId();
+            $query = $GLOBALS['DB']->query("SELECT * FROM author WHERE name = '{$this->getName()}';");
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            if(empty($result)){
+                $GLOBALS['DB']->exec("INSERT INTO author (name) VALUES ('{$this->getName()}');");
+                $this->id = $GLOBALS['DB']->lastInsertId();
+            } else {
+                $this->id = $result['id'];
+            }
         }
 
         function update($new_name)
@@ -72,6 +78,21 @@
             return $author;
 
         }
+
+        static function search($search_author)
+        {
+            $query = $GLOBALS['DB']->query("SELECT books.* FROM author JOIN books_authors ON (author.id = books_authors.author_id) JOIN books ON (books_authors.book_id = books.id) WHERE name LIKE '%{$search_author}%';");
+            $returned_books = $query->fetchAll(PDO::FETCH_ASSOC);
+            $books =[];
+            foreach($returned_books as $book) {
+                $title = $book['title'];
+                $id = $book['id'];
+                $new_book = new Book($title, $id);
+                array_push($books, $new_book);
+            }
+            return $books;
+        }
+
         static function getAll()
         {
             $returned_authors = $GLOBALS['DB']->query("SELECT * FROM author;");

@@ -2,11 +2,55 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title></title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <title>My Library</title>
     </head>
     <body>
-        <p>
-            hello
-        </p>
+        <div class="container">
+            <h2>Hello {{patron.getName}}</h2>
+            <h2>Search Book</h2>
+                <form method="post" action="/search">
+                    <div class="form-group">
+                        <input type="hidden" name="patron_id" value="{{patron.getId}}">
+                        <label for="search">Search Book</label>
+                        <input type="text" name="search" id="search" class="form-control">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name='search_type' value="title" checked>
+                                Search by Title
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name='search_type' value="author">
+                                Search by Author
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-info">Search</button>
+                </form>
+                {% if books is not empty %}
+                    <ul>
+                    {% for book in books %}
+                    {% for copy in book.getCopies %}
+                        <a href="copy/{{copy.getId}}"><li>Book Title: {{book.getTitle}} Author:
+                            {% for author in book.getAuthors %}
+                                {{author.getName}}
+                            {% endfor %}
+                            Copies:
+                            {{book.getCopies()|length}}</li></a>
+                    {% endfor %}
+                    {% endfor %}
+                    </ul>
+                    {% endif %}
+            <h2>History</h2>
+            {% if checkouts is not empty %}
+            {% for checkout in checkouts %}
+                {{checkout.getCheckoutDate}}
+                {{checkout.getDueDate}}
+                {{}}
+            {% endfor %}
+            {% endif %}
+        </div>
     </body>
 </html>

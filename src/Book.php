@@ -25,14 +25,22 @@
           return $this->id;
       }
 
-      function save($number_of_books = null)
+      function save()
       {
-          //Books Table
-          $GLOBALS['DB']->exec("INSERT INTO books (title) VALUES ('{$this->getTitle()}');");
-          $this->id = $GLOBALS['DB']->lastInsertId();
 
-          //Copies Table
-          $GLOBALS['DB']->exec("INSERT INTO copies (book_id, number) VALUES ('{$this->getId()}', {$number_of_books});");
+          $query = $GLOBALS['DB']->query("SELECT * FROM books WHERE title = '{$this->getTitle()}';");
+          $result = $query->fetch(PDO::FETCH_ASSOC);
+          if(empty($result)){
+              //Books Table
+              $GLOBALS['DB']->exec("INSERT INTO books (title) VALUES ('{$this->getTitle()}');");
+              $this->id = $GLOBALS['DB']->lastInsertId();
+          }
+          else {
+              $this->id = $result['id'];
+
+          }
+
+
       }
 
       function update($new_title)
@@ -67,6 +75,19 @@
           return $authors;
       }
 
+      function getCopies()
+      {
+          $returned_copies = $GLOBALS['DB']->query("SELECT * FROM copies WHERE  book_id = {$this->getId()};");
+          $copies = [];
+          foreach($returned_copies as $copy){
+              $book_id = $copy['book_id'];
+              $id = $copy['id'];
+              $new_copy = new Copy($book_id, $id);
+              array_push($copies, $new_copy);
+          }
+          return $copies;
+      }
+
       static function find($id)
       {
           $query = $GLOBALS['DB']->query("SELECT * FROM books WHERE id = {$id};");
@@ -76,6 +97,20 @@
           $book = new Book($title, $id);
           return $book;
 
+      }
+
+      static function search($search_title)
+      {
+          $query = $GLOBALS['DB']->query("SELECT * FROM books WHERE title LIKE '%{$search_title}%';");
+          $returned_books = $query->fetchAll(PDO::FETCH_ASSOC);
+          $books =[];
+          foreach($returned_books as $book) {
+              $title = $book['title'];
+              $id = $book['id'];
+              $new_book = new Book($title, $id);
+              array_push($books, $new_book);
+          }
+          return $books;
       }
 
       static function getAll()

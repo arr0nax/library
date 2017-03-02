@@ -179,4 +179,18 @@ class PatronTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($test_patron2, $result);
 
     }
+    function test_login()
+    {
+        $name = 'John';
+        $password = 'hello';
+        $email = 'john@gmail.com';
+        $test_patron = new Patron($name, $password, $email);
+        $test_patron->encrypt_password();
+        $test_patron->save();
+
+        $result = Patron::login($email, $password);
+
+        $this->assertEquals($test_patron, $result);
+
+    }
 }

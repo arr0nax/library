@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{book.getTitle}}</title>
+    </head>
+    <body>
+        <h2>{{book.getTitle}}</h2>
+        <h3>By {% for author in book.getAuthors %}
+            {{author.getName}}
+        {% endfor %}</h3>
+        <h3>Copies: {{book.getCopies|length}}</h3>
+    </body>
+    <a href="/checkout/{{copy.getId}}"></a><button type="button" name="button">Check This Book Out</button>
+</html>

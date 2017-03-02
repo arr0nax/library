@@ -60,15 +60,36 @@
             $GLOBALS['DB']->exec("INSERT INTO checkout (patron_id, copy_id, due_date, checkout_date, returned) VALUES ({$this->getId()}, {$checkout->getCopy_id()}, '{$checkout->getDueDate()}', '{$checkout->getCheckoutDate()}', {$checkout->getReturned()});");
         }
 
+        function encrypt_password()
+        {
+            $username = $this->email;
+            $password = $this->password;
+
+            $cost = 10;
+
+            $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
+
+            $salt = sprintf("$2a$%02d$", $cost) . $salt;
+
+            $hash = crypt($password, $salt);
+
+            $this->setPassword($hash);
+        }
+
         static function login($email, $password)
         {
-            $query = $GLOBALS['DB']->query("SELECT * FROM patron WHERE email = '{$email}' AND password = '{$password}');");
-            $result = $query->fetch(PDO::FETCH_ASSOC);
-            if($result) {
-                $name = $result['name'];
-                $password = $result['password'];
-                $email = $result['email'];
-                $id = $result['id'];
+            $sth = $GLOBALS['DB']->prepare('SELECT * FROM patrons WHERE email = :email LIMIT 1;');
+
+            $sth->bindParam(':email', $email);
+
+            $sth->execute();
+
+            $user = $sth->fetch(PDO::FETCH_ASSOC);
+            if(hash_equals($user['password'], crypt($password, $user['password']))) {
+                $name = $user['name'];
+                $password = $user['password'];
+                $email = $user['email'];
+                $id = $user['id'];
                 $new_result = new Patron($name, $password, $email, $id);
                 return $new_result;
             }
