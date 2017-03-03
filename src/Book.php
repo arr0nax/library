@@ -81,8 +81,9 @@
           $copies = [];
           foreach($returned_copies as $copy){
               $book_id = $copy['book_id'];
+              $available = $copy['available'];
               $id = $copy['id'];
-              $new_copy = new Copy($book_id, $id);
+              $new_copy = new Copy($book_id, $available, $id);
               array_push($copies, $new_copy);
           }
           return $copies;

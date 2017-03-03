@@ -66,6 +66,7 @@
     function setReturned($returned)
     {
         $this->returned = $returned;
+        $GLOBALS['DB']->exec("UPDATE checkout SET returned = {$returned} WHERE id = {$this->getId()};");
     }
 
     function getId()
@@ -81,7 +82,12 @@
 
     function getBook()
     {
-        $query = $GLOBALS['DB']->query("SELECT * FROM copies WHERE id = {$search_id};");
+        $query = $GLOBALS['DB']->query("SELECT books.* FROM checkout JOIN copies ON (checkout.copy_id = copies.id) JOIN books ON (copies.book_id = books.id) WHERE checkout.id = {$this->getId()};");
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+        $title = $result['title'];
+        $id = $result['id'];
+        $new_book = new Book($title, $id);
+        return $new_book;
 
     }
 

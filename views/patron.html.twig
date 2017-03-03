@@ -33,12 +33,13 @@
                     <ul>
                     {% for book in books %}
                     {% for copy in book.getCopies %}
+
+                    {% if copy.getAvailable == 1 %}
                         <a href="copy/{{copy.getId}}"><li>Book Title: {{book.getTitle}} Author:
                             {% for author in book.getAuthors %}
                                 {{author.getName}}
-                            {% endfor %}
-                            Copies:
-                            {{book.getCopies()|length}}</li></a>
+                            {% endfor %}</li></a>
+                    {% endif %}
                     {% endfor %}
                     {% endfor %}
                     </ul>
@@ -46,9 +47,14 @@
             <h2>History</h2>
             {% if checkouts is not empty %}
             {% for checkout in checkouts %}
-                {{checkout.getCheckoutDate}}
-                {{checkout.getDueDate}}
-                {{}}
+                <p><strong>Book Title:</strong> {{checkout.getBook.getTitle}}</p>
+                <p><strong>Checkout Date:</strong> {{checkout.getCheckoutDate}}</p>
+                <p><strong>Return Due Date:</strong> {{checkout.getDueDate}}</p>
+                {% if checkout.getReturned == "1" %}
+                    <p>Returned</p>
+                {% else %}
+                    <a href='/return/{{checkout.getId}}'><button type="submit">Return</button></a><br><br>
+                {% endif %}
             {% endfor %}
             {% endif %}
         </div>

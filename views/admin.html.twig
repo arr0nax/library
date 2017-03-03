@@ -20,11 +20,11 @@
         {% if books is not empty %}
             <ul>
             {% for book in books %}
-                <li>Book Title: {{book.getTitle}} Author:
+                <a href='/edit/{{book.getId}}'><li>Book Title: {{book.getTitle}} Author:
                     {% for author in book.getAuthors %}
                         {{author.getName}}
                     {% endfor %}
-                    Copies: {{book.getCopies()|length}}</li>
+                    Copies: {{book.getCopies()|length}}</li></a>
             {% endfor %}
             </ul>
         {% endif %}

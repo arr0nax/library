@@ -9,7 +9,8 @@
         <h3>By {% for author in book.getAuthors %}
             {{author.getName}}
         {% endfor %}</h3>
-        <h3>Copies: {{book.getCopies|length}}</h3>
+    <form class="" action="/checkout/{{copy.getId}}" method="post">
+        <button type="submit" name="button">Check This Book Out</button>
+    </form>
     </body>
-    <a href="/checkout/{{copy.getId}}"></a><button type="button" name="button">Check This Book Out</button>
 </html>

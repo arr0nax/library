@@ -54,10 +54,13 @@
 
 
     $app->get('/patron/{id}', function($id) use($app) {
+        if($id != $_SESSION['patron']->getId()){
+            return $app->redirect('/');
+        }
         $books = [];
         $patron = Patron::find($id);
         $checkouts = Checkout::getByPatron($id);
-        $checked_books = 
+
         return $app['twig']->render('patron.html.twig', ['patron'=>$patron,'books'=>$books, 'checkouts'=>$checkouts]);
     });
 
@@ -65,6 +68,7 @@
         $new_patron = new Patron($_POST['name'], $_POST['password'], $_POST['email']);
         $new_patron->encrypt_password();
         $new_patron->save();
+        $_SESSION['patron']=$new_patron;
         return $app->redirect('/patron/'.$new_patron->getId());
     });
 
@@ -75,14 +79,15 @@
         } elseif ($_POST['search_type'] == 'author') {
             $result = Author::search($_POST['search']);
         }
+        $checkouts = Checkout::getByPatron($_SESSION['patron']->getId());
         $patron = Patron::find(intVal($_POST['patron_id']));
-        return $app['twig']->render('patron.html.twig', ['patron'=>$patron, 'books'=>$result]);
+        return $app['twig']->render('patron.html.twig', ['patron'=>$patron, 'books'=>$result, 'checkouts'=>$checkouts]);
     });
 
     $app->get('/copy/{id}', function($id) use($app) {
         $copy = Copy::find($id);
         $book = Book::find($copy->getBook_id());
-        return $app['twig']->render('book.html.twig',['book'=>$book]);
+        return $app['twig']->render('book.html.twig',['book'=>$book,'copy'=>$copy]);
     });
 
     $app->post('/checkout/{id}', function($id) use($app) {
@@ -90,6 +95,7 @@
         $patron_id = $_SESSION['patron']->getId();
         $checkout = new Checkout($patron_id, $id);
         $checkout->save();
+        $copy->setAvailable(0);
         return $app->redirect('/patron/'.$patron_id);
     });
 
@@ -112,8 +118,24 @@
             $copy = new Copy($new_book->getId());
             $copy->save();
         }
-
         return $app->redirect('/admin');
+    });
+
+    $app->get('/return/{id}', function($id) use($app) {
+        $checkout = Checkout::find($id);
+
+        $copy = Copy::find($checkout->getCopy_id());
+        $copy->setAvailable(1);
+        $checkout->setReturned(1);
+
+
+        return $app->redirect('/patron/'.$_SESSION['patron']->getId());
+    });
+
+    $app->get('/edit/{id}', function($id) use($app) {
+        $book = Book::find($id);
+        $copies = $book->getCopies();
+        return $app['twig']->render('edit.html.twig', ['book' =>$book, 'copies'=>$copies]);
     });
 
     return $app;

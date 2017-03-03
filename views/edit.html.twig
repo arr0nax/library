@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{book.getTitle}}</title>
+    </head>
+    <body>
+        <h2>{{book.getTitle}}</h2>
+
+        {% if book is not empty%}
+            <ul>
+            {% for copy in book.getCopies %}
+                <li>Copy ID: {{copy.getId}}<br>
+                    Availability: {{copy.getAvailable}}<br>
+                    Patron: {{copy.getPatron.getName}}
+                </li>
+                <br>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </body>
+</html>
